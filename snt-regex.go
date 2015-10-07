@@ -98,9 +98,11 @@ func parseLines(raw string) []string {
 		}
 	}
 
+	/*
 	for i, r := range allResults {
 		fmt.Println("R", i, ": ", r)
 	}
+	*/
 	return allResults
 }
 
@@ -179,18 +181,25 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-
+		if (len(r.Form["passcode"]) > 0) {
+			passcode = r.Form["passcode"][0]
+		} else {
+			passcode = ""
+		}
 
 		//check if no passcode set, new user
-		if users[user] == "" && len(r.Form["passcode"]) > 0 {
+		if users[user] == "" && len(passcode) > 0 {
 			//set new passcode
-			passcode = r.Form["passcode"][0]
 			users[user] = passcode
 
-			//initialize user map array
-			userStickies[user] = make([][]string, 0)
+			//initialize user map array, if user does not exist
+			if (userStickies[user] == nil) {
+				fmt.Println("user did not have map, so made one for him")
+				fmt.Println("new user ", user)
+				userStickies[user] = make([][]string, 0)
+			}
 
-			fmt.Println("new user ", user)
+			
 
 			//set use first entry
 			data = r.Form["data"][0]
@@ -199,7 +208,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			return
 
 		//if passcode set, verify
-		} else if len(r.Form["passcode"]) > 0 && r.Form["passcode"][0] == users[user] {
+		} else if passcode == users[user] {
 
 			fmt.Println("passcode matches")
 
@@ -210,9 +219,13 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Println("no data")
 			}
 
+			fmt.Println(r.Form["number"])
+
 			//check number
 			if len(r.Form["number"]) > 0 {
 				stickyNumber, err = strconv.Atoi(r.Form["number"][0])
+
+				fmt.Println("Note index", r.Form["number"])
 
 				if err != nil { //failed number parse, append new note
 					fmt.Println("Error parsing number, append new note")
