@@ -1,0 +1,37 @@
+input {
+	width:100%;
+	padding: 5px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.errorSpan {
+	width: 50%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.centerHorizSpan {
+
+}
+
+#submit {
+	width:100%;
+}
+
+#loadingDiv {
+	width: 100%;
+
+}
+
+#noteDiv {
+	background-color: #fdfdc5;
+	padding: 20px;
+	margin: 10px;
+}
+#formDiv {
+	position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

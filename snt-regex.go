@@ -9,6 +9,8 @@ import (
 	"encoding/base64"
 	"os"
 	"time"
+	"html"
+	"io/ioutil"
 )
 
 var users map[string]string
@@ -106,8 +108,30 @@ func parseLines(raw string) []string {
 	return allResults
 }
 
-func rootHandler(w http.ResponseWriter, r *http.Request) {
+func aboutHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	fmt.Fprintf(w, "Sticky Server v1 by Anson Liu")
+}
+
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	fmt.Println(html.EscapeString(r.URL.Path))
+	
+	file := "/index.html"
+
+	if (r.URL.Path != "/") {
+		file = r.URL.Path
+	} 
+	if (r.URL.Path == "/favicon.ico") {
+		return
+	}
+
+	data, err := ioutil.ReadFile("./pages" + file)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Fprintf(w, string(data))
+	
 }
 
 func uptimeHandler(w http.ResponseWriter, r *http.Request) {
@@ -135,8 +159,8 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		//check for blank user
 		if (len(user) == 0){
-			fmt.Println("blank user, sending back error");
-			fmt.Fprintf(w, "Please supply a nickname.");
+			fmt.Println("Blank user, sending back error");
+			fmt.Fprintf(w, "1 Please supply a nickname.");
 		}
 
 		if (passcode == users[user]) {
@@ -146,12 +170,12 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			fmt.Fprintf(w, string(output))
 		} else {
-			fmt.Fprintf(w, "Wrong passcode")
+			fmt.Fprintf(w, "1 Wrong PIN")
 		}
 
 
 	} else {
-		fmt.Fprintf(w, "Missing nickname/passcode")
+		fmt.Fprintf(w, "1 Missing nickname/PIN")
 	}
 }
 
@@ -279,6 +303,7 @@ func server() {
 	http.HandleFunc("/update", updateHandler)
 	http.HandleFunc("/getUser", getUserHandler)
 	http.HandleFunc("/uptime", uptimeHandler)
+	http.HandleFunc("/about", aboutHandler)
 	http.HandleFunc("/", rootHandler)
 	//http.ListenAndServe(":8080", nil)
 
@@ -287,7 +312,7 @@ func server() {
 		panic(err)
 	}
 
-	fmt.Println("listening on port " + os.Getenv("PORT"))
+	fmt.Println("Server ended on port " + os.Getenv("PORT"))
 }
 
 func main() {
