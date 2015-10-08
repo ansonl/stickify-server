@@ -1,1 +1,1 @@
-web: snt-regex
+web: sticky-server
