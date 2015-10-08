@@ -1,0 +1,8 @@
+{
+	"ImportPath": "github.com/ansonl/sticky-server",
+	"GoVersion": "go1.2.1",
+	"Packages": [
+		"./..."
+	],
+	"Deps": []
+}
