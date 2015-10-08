@@ -18,7 +18,7 @@ function submitInput(event) {
 
 	var request = $.ajax({
 	  method: "POST",
-	  url: "http://mich302csd17u:8080/getUser",
+	  url: "https://stickify.herokuapp.com/getUser",
 	  data: { user: $('#nickname').val(), passcode: $('#pin').val()}
 	})
 	request.done(function( msg ) {
@@ -60,7 +60,8 @@ function submitInput(event) {
     	} else {
     		//golang iotuil.ReadFile issue with % characters
     		//colSize = 6 / (parsed.length % 3);
-    		colSize = 6 / (parsed.length - Math.floor(parsed.length / 3) * 3);
+    		colSize = 6 / ((parsed.length - Math.floor(parsed.length / 3) * 3) == 0) ? 2:(parsed.length - Math.floor(parsed.length / 3) * 3);
+
     	}
 
     	outputList += '<div id="noteDiv" class="col-lg-'  + colSize + '">' + '<ul>'
