@@ -175,8 +175,9 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 		    if (userStickies[user] == nil) { //passcode does not match and user has no stickies, account probably not taken
 		        fmt.Fprintf(w, "1 Nickname " + user + " not found.")
+		    } else {
+		        fmt.Fprintf(w, "1 Wrong PIN")
 		    }
-			fmt.Fprintf(w, "1 Wrong PIN")
 		}
 
 
