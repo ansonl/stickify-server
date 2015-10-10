@@ -64,7 +64,7 @@ func parseLines(raw string) []string {
 
 	rawString, err := base64.StdEncoding.DecodeString(raw)
 	if err != nil {
-		fmt.Println("base64 decode error:", err)
+		fmt.Println("Base64 decode error:", err)
 	}
 
 	castedInput := string(rawString)
@@ -114,7 +114,9 @@ func aboutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	http.Redirect(w, r, "https://ansonl.github.io/stickify-web-app", 301)
+	
+	/*
 	fmt.Println(html.EscapeString(r.URL.Path))
 	
 	file := "/index.html"
@@ -131,6 +133,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	fmt.Fprintf(w, string(data))
+	*/
 	
 }
 
@@ -159,7 +162,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		//check for blank user
 		if (len(user) == 0){
-			fmt.Println("Blank user, sending back error");
+			fmt.Println("Blank user, sending back error.");
 			fmt.Fprintf(w, "1 Please supply a nickname.");
 		}
 
@@ -170,6 +173,9 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			fmt.Fprintf(w, string(output))
 		} else {
+		    if (userStickies[user] == nil) { //passcode does not match and user has no stickies, account probably not taken
+		        fmt.Fprintf(w, "1 Nickname " + user + " not found.")
+		    }
 			fmt.Fprintf(w, "1 Wrong PIN")
 		}
 
@@ -196,11 +202,11 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	if len(r.Form["user"]) > 0 {
 		user = r.Form["user"][0]
 
-		fmt.Println("user: ", user)
+		fmt.Println("User "+ user + " sent update request.")
 
 		//check for blank user
 		if (len(user) == 0){
-			fmt.Println("blank user, sending back error");
+			fmt.Println("Blank user, sending back error.");
 			fmt.Fprintf(w, "Please supply a nickname.");
 			return
 		}
@@ -218,8 +224,8 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 			//initialize user map array, if user does not exist
 			if (userStickies[user] == nil) {
-				fmt.Println("user did not have map, so made one for him")
-				fmt.Println("new user ", user)
+			    fmt.Println("New user " + user)
+				fmt.Println("User " + user + " did not have map, so made one for user.")
 				userStickies[user] = make([][]string, 0)
 			}
 
@@ -234,25 +240,23 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		//if passcode set, verify
 		} else if passcode == users[user] {
 
-			fmt.Println("passcode matches")
+			fmt.Println("Passcode for user" + user + "matches.")
 
 			//set data var
 			if len(r.Form["data"]) > 0 {
 				data = r.Form["data"][0]
 			} else {
-				fmt.Println("no data")
+				fmt.Println("No data sent for update.")
 			}
-
-			fmt.Println(r.Form["number"])
 
 			//check number
 			if len(r.Form["number"]) > 0 {
 				stickyNumber, err = strconv.Atoi(r.Form["number"][0])
 
-				fmt.Println("Note index", r.Form["number"])
+				fmt.Println("Update note index ", r.Form["number"])
 
 				if err != nil { //failed number parse, append new note
-					fmt.Println("Error parsing number, append new note")
+					fmt.Println("Error parsing number, append new note to user stickies array.")
 					userStickies[user] = append(userStickies[user], parseLines(data))
 					fmt.Fprintf(w, "0")
 					return
@@ -275,11 +279,6 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 
-			if len(r.Form["data"]) > 0 {
-				data = r.Form["data"][0]
-			} else {
-				fmt.Println("no data")
-			}
 			userStickies[user] = append(userStickies[user], parseLines(data))
 			fmt.Fprintf(w, "0")
 
