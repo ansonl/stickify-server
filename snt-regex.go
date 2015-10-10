@@ -9,8 +9,8 @@ import (
 	"encoding/base64"
 	"os"
 	"time"
-	"html"
-	"io/ioutil"
+//	"html"
+//	"io/ioutil"
 )
 
 var users map[string]string
