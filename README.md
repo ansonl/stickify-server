@@ -15,7 +15,7 @@ View your Microsoft Windows [Sticky Notes](http://windows.microsoft.com/en-us/wi
 Running Stickify Server
 -------------
 
- - Install Go
+ - Install [Go](https://golang.org/doc/install/source)
  - Get Stickify Server code
 ```
 git clone https://github.com/ansonl/stickify-server.git
@@ -25,7 +25,7 @@ git clone https://github.com/ansonl/stickify-server.git
 ```
 go build stickify-server.go
 ```
-- Set $PORT environment variable to specify port for Stickify Server to listen on. 
+- Set `PORT` environment variable to specify port for Stickify Server to listen on. 
 ```
 export PORT=80 #stickify-server will listen on port 80
 ```
@@ -33,4 +33,6 @@ export PORT=80 #stickify-server will listen on port 80
 ```
 ./stickify-server
 ```
+Notes
+-------------
 Stickify Server has only been tested on Linux and OS X. 
