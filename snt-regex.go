@@ -15,8 +15,12 @@ import (
 
 var users map[string]string
 var userStickies map[string][][]string
+var userLastUpdate map[string]time.Time
 
 var startTime = time.Now()
+
+var userExpireSeconds = 60 * 60 * 24 * time.Second;
+
 
 func parseLines(raw string) []string {
 
@@ -110,7 +114,8 @@ func parseLines(raw string) []string {
 
 func aboutHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	fmt.Fprintf(w, "Sticky Server v1 by Anson Liu")
+	fmt.Fprintf(w, "Sticky Server by Anson Liu\n")
+	fmt.Fprintf(w, "User expiry duration (with no updates from Stickify Pusher) is " + userExpireSeconds.String())
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -174,8 +179,10 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, string(output))
 		} else {
 		    if (userStickies[user] == nil) { //passcode does not match and user has no stickies, account probably not taken
+		        fmt.Println("User " + user + " not found.");
 		        fmt.Fprintf(w, "1 Nickname " + user + " not found.")
 		    } else {
+		        fmt.Println("Wrong PIN for user " + user);
 		        fmt.Fprintf(w, "1 Wrong PIN")
 		    }
 		}
@@ -254,7 +261,10 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			if len(r.Form["number"]) > 0 {
 				stickyNumber, err = strconv.Atoi(r.Form["number"][0])
 
-				fmt.Println("Update note index ", r.Form["number"])
+				//fmt.Println("Update note index ", r.Form["number"])
+
+                //update user last updated time
+                userLastUpdate[user] = time.Now()
 
 				if err != nil { //failed number parse, append new note
 					fmt.Println("Error parsing number, append new note to user stickies array.")
@@ -319,16 +329,25 @@ func main() {
 
 	users = make(map[string]string)
 	userStickies = make(map[string][][]string)
+	userLastUpdate = make(map[string]time.Time)
 
 	go server()
 
-	ticker := time.NewTicker(60 * 60 * 24 * time.Second)
+    //check for old users
+	ticker := time.NewTicker(60 * time.Second)
 
 	for {
 		select {
 		case <-ticker.C:
-			users = make(map[string]string)
-			userStickies = make(map[string][][]string)
+		    fmt.Println("Checking for old users.")
+            for k, _ := range users {
+             if time.Since(userLastUpdate[k]) > userExpireSeconds {
+                fmt.Println("User " + k + " removed. Last updated " + time.Since(userLastUpdate[k]).String() + " ago.")
+                delete(users, k)
+                delete(userStickies, k)
+                delete(userLastUpdate, k)
+             }
+            }
 		}
 	}
 }
