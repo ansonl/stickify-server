@@ -8,16 +8,9 @@ View your Microsoft Windows [Sticky Notes](http://windows.microsoft.com/en-us/wi
 
 ↓ Stickify Server
 ===================
-
- 1. Clone 
- 2. **Pre-built executable is in the `dist` folder if you do not want to compile Stickify Pusher yourself.**  
-	 - This executable connects to the *stickify.herokuapp.com* server. 
-		 - Provided server is set to wipe nicknames and associated sticky notes if Sticky Pusher has not contacted the server in 24 hours. 
-		 - [Stickify Server source](https://github.com/ansonl/stickify-server). 
-	 - If you get an error about a missing DLL, your computer is missing the Microsoft Visual C++ Redistributable for VS 2015. The patch can be downloaded [here](http://www.microsoft.com/en-us/download/details.aspx?id=48145). Pyinstaller currently has an issue with bundling the required library in an executable [#1588](https://github.com/pyinstaller/pyinstaller/issues/1588).
- 3. You may use the [Stickify web app](https://stickify.gq) to view sticky notes on your phone/other computer. 
-	 - [Stickify web app source](https://github.com/ansonl/stickify-web-app). 
-
+ - User account setup is ad hoc. A user's PIN and sticky notes will be wiped if the user does not "send stickies" in a certain amount of time from [Sticky Pusher](https://github.com/ansonl/stickify-pusher/). This expiry period can be adjusted in the `userExpireSeconds` global variable in the code. 
+	 - `userExpireSeconds` is currently set to 24 hours.
+	 - The expiry for a user is reset when whenever the user updates stickies through a successful POST request to `/update`.
 
 Running Stickify Server
 -------------
