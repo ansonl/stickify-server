@@ -159,8 +159,6 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 				userStickies[user] = make([][]string, 0)
 			}
 
-			
-
 			//set use first entry
 			data = r.Form["data"][0]
 			userStickies[user] = append(userStickies[user], parseLines(data))
