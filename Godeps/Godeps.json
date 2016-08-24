@@ -1,8 +1,17 @@
 {
-	"ImportPath": "github.com/ansonl/sticky-server",
-	"GoVersion": "go1.2.1",
-	"Packages": [
-		"./..."
-	],
-	"Deps": []
+	"ImportPath": "github.com/ansonl/stickify-server",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v74",
+	"Deps": [
+		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Comment": "v1.0.0-5-gffa8d46",
+			"Rev": "ffa8d46ada782d81cfda81a0fbd9f45ceae448e8"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Comment": "v1.0.0-5-gffa8d46",
+			"Rev": "ffa8d46ada782d81cfda81a0fbd9f45ceae448e8"
+		}
+	]
 }
