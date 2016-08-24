@@ -528,12 +528,11 @@ func main() {
 	//Setup redis connection pool
 	redisPool = createRedisPool()
 
+	/*
 	//Test sequence for sample note with three lines
 	fmt.Println(updateStickies("test", "123", 0, "c29tZSBub3RlcyBtYXRlcmlhbA0KZmFkc2Zhc2QNCnZjY3p2eHg="))
-	
 	fmt.Println(updateStickies("anson", "123", 0, "c29tZSBub3RlcyBtYXRlcmlhbA0KZmFkc2Zhc2QNCnZjY3p2eHg="))
 	fmt.Println(updateStickies("anson", "123", 1, "c29tZSBub3RlcyBtYXRlcmlhbA0KZmFkc2Zhc2QNCnZjY3p2eHg="))
-	
 	//fmt.Println(getUser("test", "123"))
 	c := redisPool.Get()
 	userNotes, err := getUserNotes("test", c)
@@ -546,6 +545,7 @@ func main() {
 		fmt.Println(err.Error())
 	}
 	fmt.Printf("Error: %v Notes: %v\n", err, string(output))
+	*/
 
 	//start server and wait
 	var wg sync.WaitGroup
