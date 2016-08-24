@@ -1,1 +1,1 @@
-web: sticky-server
+web: stickify-server
