@@ -22,7 +22,8 @@ var startTime = time.Now()
 var userExpirySeconds = 60 * 60 * 24
 
 var redisPool *redis.Pool
-var maxConnections = 18
+var maxConnections = 10
+var maxIdleConnections = 2
 
 var activeUserSetKey = "activeUsers"
 var inactiveUsersSetKey = "inactiveUsers"
@@ -91,6 +92,7 @@ func createLeaderboard() string {
 	returnString += "---------------------\n"
 	returnString += "Nickname\tStickies\n"
 	c := redisPool.Get()
+	defer c.Close()
 	activeUsersSet, err := redis.Strings(c.Do("SMEMBERS", activeUserSetKey))
 	if err != nil {
 		fmt.Printf("SMEMBERS error: %v\n", err.Error())
@@ -128,8 +130,6 @@ func createLeaderboard() string {
 
 	returnString += fmt.Sprintf("Active Users:\t%v\n", len(activeUserAndScore))
 
-	c.Close()
-
 	return returnString
 }
 
@@ -149,7 +149,7 @@ func uptimeHandler(w http.ResponseWriter, r *http.Request) {
 func checkUserExist(user string, c redis.Conn) bool {
 	userExists, err := redis.Int(c.Do("EXISTS", user))
 	if err != nil {
-		fmt.Printf("EXISTS error: %v", err.Error())
+		fmt.Printf("EXISTS error: %v\n", err.Error())
 		return false
 	}
 
@@ -212,6 +212,7 @@ func getUser(user string, passcode string) string {
 	}
 
 	c := redisPool.Get()
+	defer c.Close()
 	userExists := checkUserExist(user, c)
 
 	if userExists == false { //User does not exist. Tell client that user does not exist.
@@ -241,8 +242,6 @@ func getUser(user string, passcode string) string {
 			return "1 Wrong PIN"
 		}
 	}
-
-	c.Close()
 
 	return "1 Something went wrong."
 }
@@ -277,6 +276,7 @@ func updateStickies(user string, passcode string, stickyNumber int, stickyData s
 	passcodeDigest := fmt.Sprintf("%x", md5.Sum([]byte(passcode)))
 
 	c := redisPool.Get()
+	defer c.Close()
 	userExists := checkUserExist(user, c)
 
 	if userExists == false { //User does not exist. Create new user.
@@ -454,8 +454,6 @@ func updateStickies(user string, passcode string, stickyNumber int, stickyData s
 		return err.Error()
 	}
 
-	c.Close()
-
 	return "0"
 }
 
@@ -518,8 +516,17 @@ func createRedisPool() *redis.Pool {
 		}
 
 		return c, err
-	}, maxConnections)
-	pool.IdleTimeout = 10
+	}, maxIdleConnections)
+	pool.TestOnBorrow = func(c redis.Conn, t time.Time) error {
+        if time.Since(t) < time.Minute {
+            return nil
+        }
+        _, err := c.Do("PING")
+        return err
+    }
+
+	pool.MaxActive = maxConnections
+	pool.IdleTimeout = time.Second * 10
 	return pool
 }
 
